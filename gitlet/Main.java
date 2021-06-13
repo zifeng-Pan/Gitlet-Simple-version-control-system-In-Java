@@ -1,5 +1,7 @@
 package gitlet;
 
+import java.io.File;
+
 /**
  * Driver class for Gitlet, the tiny stupid version-control system.
  *
@@ -14,7 +16,12 @@ public class Main {
      */
     public static void main(String... args) {
         // FILL THIS IN
-        System.out.printf("test");
-    }
+        File dir = new File("E:\\workspace_idea1\\proj2\\gitlet");
+        File dump1 = new File(dir, "Dumpable.java");
 
+        String fileHash1 = Utils.sha1(dump1.getName() + Utils.readContentsAsString(dump1));
+        String fileHash2 = Utils.sha1(dump1.getName() + Utils.readContentsAsString(dump1));
+        System.out.println(fileHash1);
+        System.out.println(fileHash2);
+    }
 }

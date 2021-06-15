@@ -1,14 +1,12 @@
-package gitlet;
+package gitlet.commands;
 
 /**
  * Created with IntelliJ IDEA.
  * Copyright@:
  *
  * @Author: Pan Zifeng
- * @Date: 2021/06/13/9:39
+ * @Date: 2021/06/13/19:56
  * @Description:
  */
-public class command {
-
-
+public class init {
 }

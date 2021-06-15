@@ -11,4 +11,9 @@ import java.io.Serializable;
  * @Description:
  */
 public class head implements Serializable {
+    String _BranchName;
+    String _CommitID;
+
+    public head(String _BranchName, String _commitID) {
+    }
 }

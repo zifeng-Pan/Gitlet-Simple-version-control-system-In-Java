@@ -1,5 +1,11 @@
 package gitlet.commands;
 
+import gitlet.Repo;
+import gitlet.Utils;
+import gitlet.commits;
+
+import java.io.File;
+
 /**
  * Created with IntelliJ IDEA.
  * Copyright@:
@@ -9,9 +15,8 @@ package gitlet.commands;
  * @Description:
  */
 public class commit {
-    public static void commit(String msg) {
-    }
-
-    public static void commit() {
+    public static void commit(commits com, Repo repo) {
+        File commitFile = Utils.join(repo.getCommits(), File.separator, com.get_CommitID());
+        Utils.writeObject(commitFile, com);
     }
 }

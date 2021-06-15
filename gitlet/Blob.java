@@ -1,6 +1,8 @@
 package gitlet;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,8 +26,8 @@ public class Blob implements Serializable {
     public Blob() {
     }
 
-    public Blob(String _Time, String _BlobName, String _BlobID, String _Content) {
-        this._Time = _Time;
+    public Blob(String _BlobName, String _BlobID, String _Content) {
+        this._Time = DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now());
         this._BlobName = _BlobName;
         this._BlobID = _BlobID;
         this._Content = _Content;

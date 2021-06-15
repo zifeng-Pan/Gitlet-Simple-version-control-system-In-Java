@@ -1,6 +1,8 @@
 package gitlet;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 
 /**
@@ -16,24 +18,65 @@ public class Main {
      * <COMMAND> <OPERAND> ....
      */
 
-    public static void main(String... args) throws IOException {
+    public static void main(String... args) throws IOException, ClassNotFoundException {
         // FILL THIS IN
+
         String cwd = System.getProperty("user.dir");
-        Repo repo;
+        Repo repo = null;
+        boolean valid;
+
+        if (args.length == 0) {
+            emptyCommand(args);
+            return;
+        }
 
 
+        valid = vaildCommand(Class.forName("gitlet.commands.add").getResource("").getPath(), args);
+
+        if (!valid) return;
+
+        if (checkRepo(cwd)) {
+            if (args[0].equals("init")) {
+                System.out.println("A gitlet version-control system already exists in the current directory.");
+                return;
+            }
+            repo = getRepo(cwd + File.separator + ".gitlet" + File.separator + "REPO");
+            command(repo, args);
+        } else if (!args[0].equals("init")) {
+            Utils.error("The gitlet repository have not been created!");
+        } else {
+            gitlet.commands.init.init(cwd);
+        }
     }
 
-    public void oneOperand(String... args) {
-
+    public static void command(Repo repo, String... args) {
+        repo.command(args);
     }
 
-    public void emptyOperand(String... args) {
-
+    public static void emptyCommand(String... args) {
+        Utils.error("The COMMAND is EMPTY!");
     }
 
-    public void vaildOperand(String... args) {
+    public static Boolean vaildCommand(String path, String... args) {
+        String mycommand = args[0] + ".java";
+        List<String> commands = Utils.plainFilenamesIn(new File(path));
+        for (String command : commands) {
+            if (mycommand.equals(command)) return true;
+        }
+        Utils.error("The command is invalid");
+        return false;
+    }
 
+    public static Repo getRepo(String path) {
+        return (Repo) Utils.deserialize(new File(path).toPath());
+    }
+
+    public static boolean checkRepo(String cwd) {
+        List<String> files = Utils.plainFilenamesIn(cwd);
+        for (String filename : files) {
+            if (filename.equals(".gitlet")) return true;
+        }
+        return false;
     }
 
 }

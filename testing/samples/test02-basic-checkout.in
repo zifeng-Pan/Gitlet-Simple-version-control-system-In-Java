@@ -1,4 +1,4 @@
-# A simple test of adding, committing, modifying, and checking out.
+# A simple gitlet.test of adding, committing, modifying, and checking out.
 > init
 <<<
 + wug.txt wug.txt

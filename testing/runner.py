@@ -13,7 +13,7 @@ Usage: python3 tester.py OPTIONS TEST.in ...
    OPTIONS may include
        --show=N       Show details on up to N tests.
        --show=all     Show details on all tests.
-       --keep         Keep test directories
+       --keep         Keep gitlet.test directories
        --lib=DIR      Relative path to directory containing CS61BL libraries
        --timeout=SEC  Default number of seconds allowed to each execution
                       of gitlet.
@@ -22,9 +22,9 @@ Usage: python3 tester.py OPTIONS TEST.in ...
        --tolerance=N  Set the maximum allowed edit distance between program
                       output and expected output to N (default 3).
        --verbose      Print extra information about execution.
-       --superverbose Print out only output from gitlet commands (not the test
+       --superverbose Print out only output from gitlet commands (not the gitlet.test
                       commands themselves).
-       --debug        Runs the test in debug mode to allow debugging through
+       --debug        Runs the gitlet.test in debug mode to allow debugging through
                       IntelliJ.
 """
 
@@ -41,10 +41,10 @@ The instructions each have one of the following forms:
    I FILE Include.  Replace this statement with the contents of FILE,
           interpreted relative to the directory containing the .in file.
    C DIR  Create, if necessary, and switch to a subdirectory named DIR under
-          the main directory for this test.  If DIR is missing, changes
+          the main directory for this gitlet.test.  If DIR is missing, changes
           back to the default directory.  This command is principally
           intended to let you set up remote repositories.
-   T N    Set the timeout for gitlet commands in the rest of this test to N
+   T N    Set the timeout for gitlet commands in the rest of this gitlet.test to N
           seconds.
    + NAME F
           Copy the contents of src/F into a file named NAME.
@@ -101,7 +101,7 @@ TIMEOUT = 10
 DEBUG = False
 DEBUG_MSG = \
 """You are in debug mode.
-In this mode, you will be shown each command from the test case.
+In this mode, you will be shown each command from the gitlet.test case.
 If you would like to step into and debug the command, type 's'. Once you have done so, go back to IntelliJ and click the debug button.
 If you would like to move on to the next command, type 'n'."""
 
@@ -247,18 +247,18 @@ def correctProgramOutput(expected, actual, last_groups, is_regexp):
         return False
     return True
 
-def reportDetails(test, included_files, line_num):
+def reportDetails(gitlet.test, included_files, line_num):
     if show is None:
         return
     if show <= 0:
         print("   Limit on error details exceeded.")
         return
-    direct = dirname(test)
+    direct = dirname(gitlet.test)
 
-    print("    Error on line {} of {}".format(line_num, basename(test)))
+    print("    Error on line {} of {}".format(line_num, basename(gitlet.test)))
 
-    for base in [basename(test)] + included_files:
-        full = join(dirname(test), base)
+    for base in [basename(gitlet.test)] + included_files:
+        full = join(dirname(gitlet.test), base)
         print(("-" * 20 + " {} " + "-" * 20).format(base))
         text_lines = list(enumerate(re.split(r'\n\r?', contents(full))))[:-1]
         fmt = "{{:{}d}}. {{}}".format(round(log(len(text_lines), 10)))
@@ -288,9 +288,9 @@ def line_reader(f, prefix):
     except FileNotFoundError:
         raise ValueError("file {} not found".format(f))
 
-def doTest(test):
+def doTest(gitlet.test):
     last_groups = []
-    base = splitext(basename(test))[0]
+    base = splitext(basename(gitlet.test))[0]
     print("{}:".format(base), end=" \n")
     cdir = tmpdir = createTempDir(base)
     if verbose:
@@ -322,7 +322,7 @@ def doTest(test):
 
     try:
         line_num = None
-        inp = line_reader(test, '')
+        inp = line_reader(gitlet.test, '')
         included_files = []
         while True:
             line_num, line = next(inp, (line_num, ''))
@@ -336,7 +336,7 @@ def doTest(test):
             if Match(r'\s*#', line) or Match(r'\s+$', line):
                 pass
             elif Match(r'I\s+(\S+)', line):
-                inp.send(join(dirname(test), Group(1)))
+                inp.send(join(dirname(gitlet.test), Group(1)))
                 included_files.append(Group(1))
             elif Match(r'C\s*(\S*)', line):
                 if Group(1) == "":
@@ -377,29 +377,29 @@ def doTest(test):
                         msg = "incorrect output"
                 if msg != "OK":
                     print("ERROR ({})".format(msg))
-                    reportDetails(test, included_files, line_num)
+                    reportDetails(gitlet.test, included_files, line_num)
                     return False
             elif Match(r'=\s*(\S+)\s+(\S+)', line):
                 if not correctFileOutput(Group(1), Group(2), cdir):
                     print("ERROR (file {} has incorrect content)"
                           .format(Group(1)))
-                    reportDetails(test, included_files, line_num)
+                    reportDetails(gitlet.test, included_files, line_num)
                     return False
             elif Match(r'\*\s*(\S+)', line):
                 if fileExists(Group(1), cdir):
                     print("ERROR (file {} present)".format(Group(1)))
-                    reportDetails(test, included_files, line_num)
+                    reportDetails(gitlet.test, included_files, line_num)
                     return False
             elif Match(r'E\s*(\S+)', line):
                 if not fileExists(Group(1), cdir):
                     print("ERROR (file or directory {} not present)"
                           .format(Group(1)))
-                    reportDetails(test, included_files, line_num)
+                    reportDetails(gitlet.test, included_files, line_num)
                     return False
             elif Match(r'(?s)D\s*([a-zA-Z_][a-zA-Z_0-9]*)\s*"(.*)"\s*$', line):
                 defns[Group(1)] = Group(2)
             else:
-                raise ValueError("bad test line at {}".format(line_num))
+                raise ValueError("bad gitlet.test line at {}".format(line_num))
     finally:
         if not keep:
             cleanTempDir(tmpdir)
@@ -487,11 +487,11 @@ if __name__ == "__main__":
     errs = 0
     fails = 0
 
-    for test in files:
+    for gitlet.test in files:
         try:
-            if not exists(test):
+            if not exists(gitlet.test):
                 num_tests -= 1
-            elif not doTest(test):
+            elif not doTest(gitlet.test):
                 errs += 1
                 if type(show) is int:
                     show -= 1

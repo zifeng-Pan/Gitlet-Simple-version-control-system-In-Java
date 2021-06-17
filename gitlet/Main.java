@@ -1,7 +1,7 @@
 package gitlet;
 
 import java.io.File;
-import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 
@@ -18,7 +18,8 @@ public class Main {
      * <COMMAND> <OPERAND> ....
      */
 
-    public static void main(String... args) throws IOException, ClassNotFoundException {
+    public static void main(String... args) throws ClassNotFoundException, NoSuchMethodException,
+            IllegalAccessException, InvocationTargetException {
         // FILL THIS IN
 
         String cwd = System.getProperty("user.dir");
@@ -30,8 +31,8 @@ public class Main {
             return;
         }
 
-
-        valid = vaildCommand(Class.forName("gitlet.commands.add").getResource("").getPath(), args);
+        String commandPath = Class.forName("gitlet.commands.add").getResource("").getPath();
+        valid = vaildCommand(commandPath, args);
 
         if (!valid) return;
 
@@ -49,7 +50,8 @@ public class Main {
         }
     }
 
-    public static void command(Repo repo, String... args) {
+    public static void command(Repo repo, String... args) throws ClassNotFoundException, NoSuchMethodException,
+            IllegalAccessException, InvocationTargetException {
         repo.command(args);
     }
 
@@ -72,7 +74,8 @@ public class Main {
     }
 
     public static boolean checkRepo(String cwd) {
-        List<String> files = Utils.plainFilenamesIn(cwd);
+        String[] files = new File(cwd).list();
+        if (files == null) return false;
         for (String filename : files) {
             if (filename.equals(".gitlet")) return true;
         }

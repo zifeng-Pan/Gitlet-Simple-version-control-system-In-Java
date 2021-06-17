@@ -11,11 +11,10 @@ import java.io.Serializable;
  * @Description:
  */
 public class branch implements Serializable {
-    String _BranchName;
+
     /**
      * represents the SHA-1 ID of the commit, we can use it to read commit object file.
      */
-    String _CommitID;
 
     public branch(String _BranchName, String _commitID) {
         this._BranchName = _BranchName;
@@ -37,4 +36,7 @@ public class branch implements Serializable {
     public void set_CommitID(String _CommitID) {
         this._CommitID = _CommitID;
     }
+
+    private String _CommitID;
+    private String _BranchName;
 }

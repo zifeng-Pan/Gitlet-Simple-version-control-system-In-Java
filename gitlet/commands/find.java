@@ -1,5 +1,11 @@
 package gitlet.commands;
 
+import gitlet.Repo;
+import gitlet.Utils;
+import gitlet.commits;
+
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * Copyright@:
@@ -9,6 +15,17 @@ package gitlet.commands;
  * @Description:
  */
 public class find {
-    public static void find() {
+    public static void find(Repo repo, String... args) {
+        if (args.length == 1) {
+            System.out.println("Please enter the commit message");
+            return;
+        }
+
+        String commitMsg = args[1];
+        List<String> commitList = Utils.plainFilenamesIn(repo.getCommits());
+        for (String tCommit : commitList) {
+            commits tempCommit = Utils.readObject(Utils.join(repo.getCommits(), tCommit), gitlet.commits.class);
+            if (tempCommit.get_LogMessage().equals(commitMsg)) System.out.println(tempCommit.get_CommitID());
+        }
     }
 }

@@ -6,7 +6,7 @@ import org.junit.Test;
 /**
  * The suite of all JUnit tests for the gitlet package.
  *
- * @author
+ * @author: CS61B
  */
 public class UnitTest {
 
@@ -19,7 +19,7 @@ public class UnitTest {
     }
 
     /**
-     * A dummy test to avoid complaint.
+     * A dummy gitlet.test to avoid complaint.
      */
     @Test
     public void placeholderTest() {

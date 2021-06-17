@@ -1,8 +1,10 @@
 package gitlet.commands;
 
 
+import gitlet.Repo;
+import gitlet.Utils;
 import gitlet.branch;
-import gitlet.*;
+import gitlet.commits;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,10 +29,10 @@ public class init {
         /* create a new commit */
         commits inicommit = new commits("initial commit");
         /* commit a initial commit */
-        inicommit.set_CommitID(Utils.sha1(inicommit.get_LogMessage()));
+        inicommit.set_CommitID(Utils.sha1(inicommit.get_LogMessage() + inicommit.get_TimeStamp() + inicommit.get_ParentCommitID()));
         /* create the HEAD file, branch file and the REPO file */
         createFile(inicommit, repo);
-        commit.commit(inicommit, repo);
+        commit.inicommit(inicommit, repo);
     }
 
     private static void createFolder(String repoPath) {
@@ -42,14 +44,14 @@ public class init {
 
     private static void createFile(commits comm, Repo repo) {
         branch tempBranch = new branch("master", comm.get_CommitID());
-        head tempHead = new head(tempBranch.get_BranchName());
-        Utils.writeObject(Utils.join(repo.getBranch(), File.separator, tempBranch.get_BranchName()), tempBranch);
-        Utils.writeObject(Utils.join(repo.getBranch(), File.separator, Repo.getHEAD()), tempHead);
+        Utils.writeObject(Utils.join(repo.getBranch(), tempBranch.get_BranchName()), tempBranch);
 
         ArrayList<String> tempList = new ArrayList<>();
         tempList.add("master");
         repo.setBranches(tempList);
 
-        Utils.writeObject(Utils.join(repo.getCwd(), File.separator, "REPO"), repo);
+        repo.setHEAD(comm.get_CommitID());
+        repo.setCurrBranch(tempBranch.get_BranchName());
+        Utils.writeObject(Utils.join(repo.getCwd(), "REPO"), repo);
     }
 }

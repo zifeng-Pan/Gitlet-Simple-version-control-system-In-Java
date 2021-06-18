@@ -16,10 +16,9 @@ import java.util.HashMap;
  */
 public class rm {
     public static void rm(Repo repo, String... args) {
-        if (args.length == 1) {
-            System.out.println("Please enter the filename");
-            return;
-        }
+        argumentcheck.argumentCheck(2, """
+                java gitlet.Main rm [fileName]
+                """,args);
 
         /* get the current commit */
         commits currCommit = Utils.readObject(Utils.join(repo.getCommits(), repo.getHEAD()), gitlet.commits.class);

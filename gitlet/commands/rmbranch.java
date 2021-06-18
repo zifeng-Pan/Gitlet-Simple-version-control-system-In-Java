@@ -15,10 +15,9 @@ import java.util.ArrayList;
  */
 public class rmbranch {
     public static void rmbranch(Repo repo, String... args) {
-        if (args.length == 1) {
-            System.out.println("Please enter the branch name");
-            return;
-        }
+        argumentcheck.argumentCheck(2, """
+                java gitlet.Main rmbranch [branchName]
+                """,args);
 
         boolean flag = false;
         String currBranch = repo.getCurrBranch();

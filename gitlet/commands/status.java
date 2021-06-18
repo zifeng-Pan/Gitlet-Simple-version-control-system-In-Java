@@ -40,6 +40,7 @@ public class status {
         removedFile.forEach(System.out::println);
         System.out.print("\n\n");
 
+        System.out.println("-------- Untracked PART -------");
         System.out.println("===Modifications Not Staged For Commit===");
         for (String deleted : deletedFile) {
             System.out.println((deleted + "(deleted)"));

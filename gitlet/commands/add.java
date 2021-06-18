@@ -20,10 +20,10 @@ import java.util.List;
 public class add {
     /* add a file to the stage area */
     public static void add(Repo repo, String... args) {
-        if (args.length == 1) {
-            Utils.message("The arguments is not enough!");
-            return;
-        }
+        argumentcheck.argumentCheck(2, """
+                java gitlet.Main add [filename]
+                java gitlet.Main add .
+                """,args);
         ArrayList<String> modifiedFile = repo.getModifiedFile();
         ArrayList<String> deletedFile = repo.getDeletedFile();
         ArrayList<String> untrackedFile = repo.getUntrackedFile();
@@ -82,7 +82,6 @@ public class add {
             /* remove from list */
             removeFromList(modifiedFiles, deletedFiles, untrackedFiles, addFile);
         } else if (repo.getDeletedFile().contains(addFile.getName())) {
-            System.out.println("test");
             repo.getRemovedFile().add(addFile.getName());
             repo.getDeletedFile().remove(addFile.getName());
         } else Utils.error("File does not exist");

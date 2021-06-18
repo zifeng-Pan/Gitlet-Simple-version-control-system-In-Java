@@ -16,10 +16,9 @@ import java.util.List;
  */
 public class find {
     public static void find(Repo repo, String... args) {
-        if (args.length == 1) {
-            System.out.println("Please enter the commit message");
-            return;
-        }
+        argumentcheck.argumentCheck(2, """
+                java gitlet.Main find [targetCommitMessage]
+                """,args);
 
         String commitMsg = args[1];
         List<String> commitList = Utils.plainFilenamesIn(repo.getCommits());

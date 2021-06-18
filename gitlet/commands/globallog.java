@@ -25,9 +25,18 @@ public class globallog {
         for (String tempBranch : branches) {
             /* get the tempBranch */
             branch branch = Utils.readObject(Utils.join(repo.getBranch(), tempBranch), gitlet.branch.class);
+            if(branch.get_CommitID().equals(head)) continue;
             commits currCommit = Utils.readObject(Utils.join(repo.getCommits(), branch.get_CommitID()), gitlet.commits.class);
-            if (currCommit.get_CommitID().equals(head) || currCommit.isSplitPoint()) continue;
-            log.logHelper(repo, currCommit);
+            while (true) {
+                if(currCommit.isSplitPoint()) break;
+                System.out.println("===");
+                System.out.println("Commit:" + currCommit.get_CommitID());
+                System.out.println(currCommit.get_TimeStamp());
+                System.out.println(currCommit.get_LogMessage());
+                System.out.print("\n\n");
+                if (currCommit.get_ParentCommitID() == null ) break;
+                currCommit = Utils.readObject(Utils.join(repo.getCommits(), currCommit.get_ParentCommitID()), gitlet.commits.class);
+            }
         }
         log.log(repo, args);
     }

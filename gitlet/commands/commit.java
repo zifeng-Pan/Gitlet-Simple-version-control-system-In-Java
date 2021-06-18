@@ -24,11 +24,16 @@ public class commit {
         if (stageBlobs.isEmpty() && repo.getRemovedFile().isEmpty()) {
             System.out.println("No changes added to the commit");
             return;
-        } else if (args.length == 1) {
-            System.out.println("Please enter a commit message");
-            return;
         }
+        argumentcheck.argumentCheck(2, """
+                java gitlet.Main commit [commitMessage]
+                """,args);
 
+        commitHelper(repo,args);
+
+    }
+
+    public static void commitHelper(Repo repo, String ... args){
         /* read the currCommits and create the new commit*/
         commits currCommits = Utils.readObject(Utils.join(repo.getCommits(), repo.getHEAD()), gitlet.commits.class);
         commits newCommits = new commits(currCommits.get_CommitID(), args[1]);
@@ -43,7 +48,6 @@ public class commit {
         /* write back */
         Utils.writeObject(Utils.join(repo.getCommits(), newCommits.get_CommitID()), newCommits);
         head_branch(repo, newCommits);
-
     }
 
     public static void inicommit(commits com, Repo repo) {

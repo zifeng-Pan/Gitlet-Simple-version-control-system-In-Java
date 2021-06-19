@@ -21,13 +21,16 @@ import java.util.Map;
 public class commit {
     public static void commit(Repo repo, String... args) {
         HashMap<String, String> stageBlobs = repo.getStageBlobs();
+
+        if (!checkout.areaCheck(repo)) return;
         if (stageBlobs.isEmpty() && repo.getRemovedFile().isEmpty()) {
             System.out.println("No changes added to the commit");
             return;
         }
-        argumentcheck.argumentCheck(2, """
+        if(!argumentcheck.argumentCheck(2, """
                 java gitlet.Main commit [commitMessage]
-                """,args);
+                """,args)) return;
+
 
         commitHelper(repo,args);
 

@@ -16,9 +16,9 @@ import java.util.ArrayList;
  */
 public class branch {
     public static void branch(Repo repo, String... args) {
-        argumentcheck.argumentCheck(2, """
+        if(!argumentcheck.argumentCheck(2, """
                 java gitlet.Main branch [branchName]
-                """,args);
+                """,args)) return;
         /* get the branch name */
         String newBranchName = args[1];
 
@@ -27,7 +27,10 @@ public class branch {
 
         /* branch check */
         for (String tBranch : branches) {
-            if (tBranch.equals(newBranchName)) System.out.println("A branch with that name already exists.");
+            if (tBranch.equals(newBranchName)) {
+                System.out.println("A branch with that name already exists.");
+                return;
+            }
         }
 
         /* set the commit as a split point */

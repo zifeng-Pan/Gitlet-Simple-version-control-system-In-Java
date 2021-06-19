@@ -16,9 +16,9 @@ import java.util.HashMap;
  */
 public class rm {
     public static void rm(Repo repo, String... args) {
-        argumentcheck.argumentCheck(2, """
+        if(!argumentcheck.argumentCheck(2, """
                 java gitlet.Main rm [fileName]
-                """,args);
+                """,args)) return;
 
         /* get the current commit */
         commits currCommit = Utils.readObject(Utils.join(repo.getCommits(), repo.getHEAD()), gitlet.commits.class);
@@ -27,12 +27,11 @@ public class rm {
         /* get the hashmap of stage area files */
         HashMap<String, String> stageBlobs = repo.getStageBlobs();
 
-        for (String currBlob : currBlobs.keySet()) {
-            if (currBlob.equals(args[1])) {
-                rmTracked(repo, stageBlobs, currBlob);
-                Utils.writeObject(Utils.join(repo.getCommits(), repo.getHEAD()), currCommit);
-                return;
-            }
+
+        if (currBlobs.containsKey(args[1])) {
+            rmTracked(repo, stageBlobs, args[1]);
+            Utils.writeObject(Utils.join(repo.getCommits(), repo.getHEAD()), currCommit);
+            return;
         }
 
         if (stageBlobs.containsKey(args[1])) {
@@ -47,7 +46,7 @@ public class rm {
     }
 
     private static void rmTracked(Repo repo, HashMap<String, String> stage, String rmFile) {
-        /* delet the file in the work directory */
+        /* delete the file in the work directory */
         Utils.join(repo.getOutWd(), rmFile).delete();
         if (stage.containsKey(rmFile)) repo.getStageBlobs().remove(rmFile);
         repo.getDeletedFile().add(rmFile);

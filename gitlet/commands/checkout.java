@@ -92,17 +92,13 @@ public class checkout {
 
     /* just switch the branch and clear the stage area */
     private static void checkoutBranch(Repo repo,String... args) {
-        ArrayList<String> untrackedFile = repo.getUntrackedFile();
-        ArrayList<String> modifiedFile = repo.getModifiedFile();
-        ArrayList<String> deletedFile = repo.getDeletedFile();
+
         ArrayList<String> branches = repo.getBranches();
 
         String desBranch = args[1];
 
-        if(untrackedFile.size() > 0 || modifiedFile.size() >0 || deletedFile.size() > 0) {
-            System.out.println("There is an untracked file in the way; delete it or add it first.");
-            return;
-        } else if (desBranch.equals(repo.getCurrBranch())){
+        if (!areaCheck(repo))return;
+        else if (desBranch.equals(repo.getCurrBranch())){
             System.out.println("No need to checkout the current branch.");
             return;
         } else if(!branches.contains(desBranch)) {
@@ -160,6 +156,8 @@ public class checkout {
         ArrayList<String> modifiedFile = repo.getModifiedFile();
         deletedFile.remove(file);
         modifiedFile.remove(file);
+        repo.getRemovedFile().remove(file);
+        repo.getStageBlobs().remove(file);
         repo.getUntrackedFile().add(file);
     }
 
@@ -171,5 +169,16 @@ public class checkout {
         recoverHelper(repo,fileName);
 
         Utils.writeContents(Utils.join(repo.getOutWd(),fileName),blob.get_Content());
+    }
+
+    public static boolean areaCheck(Repo repo){
+        ArrayList<String> untrackedFile = repo.getUntrackedFile();
+        ArrayList<String> modifiedFile = repo.getModifiedFile();
+        ArrayList<String> deletedFile = repo.getDeletedFile();
+        if(untrackedFile.size() > 0 || modifiedFile.size() >0 || deletedFile.size() > 0) {
+            System.out.println("There is an untracked file in the way; delete it or add it first.");
+            return false;
+        }
+        return true;
     }
 }

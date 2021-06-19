@@ -16,15 +16,21 @@ import java.util.List;
  */
 public class find {
     public static void find(Repo repo, String... args) {
-        argumentcheck.argumentCheck(2, """
+        if (!argumentcheck.argumentCheck(2, """
                 java gitlet.Main find [targetCommitMessage]
-                """,args);
+                """, args)) return;
 
+        boolean findFlag = false;
         String commitMsg = args[1];
         List<String> commitList = Utils.plainFilenamesIn(repo.getCommits());
         for (String tCommit : commitList) {
             commits tempCommit = Utils.readObject(Utils.join(repo.getCommits(), tCommit), gitlet.commits.class);
-            if (tempCommit.get_LogMessage().equals(commitMsg)) System.out.println(tempCommit.get_CommitID());
+            if (tempCommit.get_LogMessage().equals(commitMsg)) {
+                System.out.println(tempCommit.get_CommitID());
+                findFlag = true;
+                break;
+            }
         }
+        if (!findFlag) System.out.println(("Can't find the commitID with " + commitMsg));
     }
 }

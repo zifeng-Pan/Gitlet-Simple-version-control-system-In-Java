@@ -9,11 +9,13 @@ package gitlet.commands;
  * @Description:
  */
 public class argumentcheck {
-    public static void argumentCheck(int number,String info,String... args){
+    public static boolean argumentCheck(int number,String info,String... args){
         if(args.length != number){
             System.out.println("Wrong number of arguments");
             System.out.println("-------HELP INFO------");
             System.out.println(info);
+            return false;
         }
+        return true;
     }
 }

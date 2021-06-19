@@ -22,9 +22,9 @@ import java.util.List;
 public class reset {
     /*  return to a commit version, and move the HEAD pointer */
     public static void reset(Repo repo, String... args) {
-        argumentcheck.argumentCheck(2, """
+        if(!argumentcheck.argumentCheck(2, """
                 java gitlet.Main reset [commitID]
-                """,args);
+                """,args)) return;
         ArrayList<String> untrackedFile = repo.getUntrackedFile();
         ArrayList<String> modifiedFile = repo.getModifiedFile();
         ArrayList<String> deletedFile = repo.getDeletedFile();
@@ -38,10 +38,6 @@ public class reset {
     }
 
     private static void resetHelper(Repo repo,String commitID){
-        /* change the head pointer and current branch */
-        repo.setHEAD(commitID);
-        branch currentBranch = Utils.readObject(Utils.join(repo.getBranch(), repo.getCurrBranch()), gitlet.branch.class);
-
         /* get the commitID list */
         List<String> commitList = Utils.plainFilenamesIn(repo.getCommits());
 
@@ -50,6 +46,10 @@ public class reset {
             System.out.println("No commit with that id exists.");
             return;
         }
+
+        /* change the head pointer and current branch */
+        repo.setHEAD(commitID);
+        branch currentBranch = Utils.readObject(Utils.join(repo.getBranch(), repo.getCurrBranch()), gitlet.branch.class);
 
         /* get the current commit and its blobs */
         commits currCommit = Utils.readObject(Utils.join(repo.getCommits(), repo.getHEAD()), gitlet.commits.class);

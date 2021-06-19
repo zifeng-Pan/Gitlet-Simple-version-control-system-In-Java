@@ -18,9 +18,9 @@ import java.util.HashMap;
  */
 public class merge {
     public static void merge(Repo repo,String ... args) {
-        argumentcheck.argumentCheck(2, """
+        if(!argumentcheck.argumentCheck(2, """
                 java gitlet.Main merge [targetBranchName]
-                """,args);
+                """,args)) return;
 
         ArrayList<String> branches = repo.getBranches();
         ArrayList<String> untrackedFile = repo.getUntrackedFile();
@@ -30,6 +30,10 @@ public class merge {
         /* do nothing if the branchName as same as the branch that HEAD points and other errors*/
         if (args[1].equals(repo.getCurrBranch())) {
             System.out.println("Cannot merge a branch with itself.");
+            return;
+        } else if (Utils.readObject(Utils.join(repo.getBranch(),args[1]),gitlet.branch.class).get_CommitID()
+                .equals(trackSplitPoint(repo).get_CommitID())){
+            System.out.println("Given branch is an ancestor of the current branch.");
             return;
         } else if(branches.size() == 1){
             System.out.println("The number of branches is 1,can't merge");
@@ -66,6 +70,9 @@ public class merge {
         /* write back */
         Utils.writeObject(Utils.join(repo.getBranch(), repo.getCurrBranch()),currBranch);
 
+        /* reset */
+        reset.reset(repo,"reset",currBranch.get_CommitID());
+
         System.out.println("Current branch fast-forwarded");
     }
 
@@ -89,7 +96,7 @@ public class merge {
 
         dealWithAbsent(repo,targetCommit.get_CommitID(),sBlobs,tBlobs,cBlobs);
         dealWithModify(repo,targetCommit.get_CommitID(),sBlobs,tBlobs,cBlobs);
-        dealWithConflict(repo,targetCommit.get_CommitID(),tBlobs,cBlobs);
+        dealWithConflict(repo,targetBranch,tBlobs,cBlobs);
     }
 
 
@@ -161,11 +168,8 @@ public class merge {
             if (cBlobs.containsKey(sFile) && tBlobs.containsKey(sFile)){
                 Blob cBlob = Utils.readObject(Utils.join(repo.getStageArea(), cBlobs.get(sFile)), Blob.class);
                 Blob tBlob = Utils.readObject(Utils.join(repo.getStageArea(), tBlobs.get(sFile)), Blob.class);
-                /* contents */
-                String sBlobContent = sBlob.get_Content();
-                String tBlobContent = tBlob.get_Content();
-                String cBlobContent = cBlob.get_Content();
-                if (!sBlobContent.equals(tBlobContent) && sBlobContent.equals(cBlobContent)){
+
+                if (modifyCompare(sBlob,tBlob) && modifyCompare(sBlob,cBlob)){
                     checkout.checkout(repo,"checkout",tCommitID,"--",sFile);
                 }
             }
@@ -173,26 +177,29 @@ public class merge {
     }
 
     // deal with the problem of file contents conflict
-    private static void dealWithConflict(Repo repo, String tCommitID,
+    private static void dealWithConflict(Repo repo, String targetBranch,
                                   HashMap<String,String> tBlobs,
                                   HashMap<String,String> cBlobs) {
+
+        boolean conflictFlag = false;
+
         for (String tFile : tBlobs.keySet()){
             if (cBlobs.containsKey(tFile)){
                 Blob cBlob = Utils.readObject(Utils.join(repo.getStageArea(), cBlobs.get(tFile)), Blob.class);
                 Blob tBlob = Utils.readObject(Utils.join(repo.getStageArea(), tBlobs.get(tFile)), Blob.class);
+                if(conflictHelper(repo,cBlob,tBlob,tFile,targetBranch))conflictFlag = true;
             }
         }
 
-
+        if (conflictFlag) System.out.println("Encountered a merge conflict.");
+        else System.out.println("Merged " + repo.getCurrBranch() + " with " + targetBranch);
     }
 
-    private static void conflictHelper(Repo repo, Blob cBlob, Blob tBlob, String file){
+    private static boolean conflictHelper(Repo repo, Blob cBlob, Blob tBlob, String file,String targetBranch){
         byte[] cBytes = cBlob.get_Content().getBytes(StandardCharsets.UTF_8);
         byte[] tBytes = tBlob.get_Content().getBytes(StandardCharsets.UTF_8);
-
         ArrayList<Byte> sameBytes = new ArrayList<>();
-        ArrayList<Byte> diffCBytes = new ArrayList<>();
-        ArrayList<Byte> diffTBytes = new ArrayList<>();
+
         int diffPos = 0;
 
         int maxLen = Math.max(cBytes.length,tBytes.length);
@@ -204,25 +211,24 @@ public class merge {
             }
         }
 
-        if (diffPos == maxLen) {
-            System.out.println("Merged [current branch name] with [given branch name]..");
-            return;
+        if (diffPos == 0) {
+            return false;
         }
 
-        for (int i = diffPos; i < cBytes.length; i++)diffCBytes.add(cBytes[i]);
-        for (int i = diffPos; i < tBytes.length; i++) diffTBytes.add(tBytes[i]);
+
+        byte[] sameByte   = new byte[sameBytes.size()];
+        for (int i = 0; i < sameBytes.size(); i ++) sameByte[i] = sameBytes.get(i);
+
         File sameFile = Utils.join(repo.getOutWd(), file);
 
+        String content = new String(sameByte) + " <<<<<<< HEAD\n" + new String(cBytes,diffPos,cBytes.length - diffPos)
+               +"\n========\n" + new String(tBytes,diffPos,tBytes.length - diffPos) + "\n >>>>>>>" + targetBranch + "\n";
+
         Utils.restrictedDelete(sameFile);
-        Utils.writeContents(sameFile,sameBytes.toArray());
-        Utils.writeContents(sameFile,"<<<<<<< HEAD\n");
-        Utils.writeContents(sameFile,diffCBytes.toArray());
-        Utils.writeContents(sameFile,"=======\n");
-        Utils.writeContents(sameFile,diffTBytes.toArray());
-        Utils.writeContents(sameFile,"=======\n");
+        Utils.writeContents(sameFile, content);
 
         repo.getModifiedFile().add(file);
-        System.out.println("Encountered a merge conflict.");
+        return true;
     }
 
     /* retrieve the commit which is the split point. */

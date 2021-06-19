@@ -15,6 +15,8 @@ A version-control system is essentially a backup system for related collections 
 
 It's important to **hava a good design document**.  The detailed design document is helpful for saving your time 🦾🦾🦾, and the bad design documnet will leads to many difficulties while coding (like what I have done)😥😥
 
+If there are still some bugs, please contact me at panzifeng00@163.com. Thank you!😀😀
+
 Official guidance: [CS61B Proj3]: http://inst.eecs.berkeley.edu/~cs61b/sp20/materials/proj/proj3/index.html
 
 All rights reserved by University of Califorina, Berkeley.

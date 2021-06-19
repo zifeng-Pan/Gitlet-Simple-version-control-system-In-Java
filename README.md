@@ -17,6 +17,6 @@ It's important to **hava a good design document**.  The detailed design document
 
 If there are still some bugs, please contact me at panzifeng00@163.com or ZifengPan09@gmail.com. Thank you!😀😀
 
-Official guidance: [CS61B Proj3]: http://inst.eecs.berkeley.edu/~cs61b/sp20/materials/proj/proj3/index.html
+Official guidance: [CS61B proj2]{https://cs61bl.org/su18/projects/gitlet/#the-commands}
 
 All rights reserved by University of Califorina, Berkeley.

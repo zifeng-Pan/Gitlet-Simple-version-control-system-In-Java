@@ -14,7 +14,7 @@ import java.util.HashMap;
  *
  * @Author: Pan Zifeng
  * @Date: 2021/06/13/19:58
- * @Description:
+ * @Description: the merge command used to merge two branch(including the fast-forward and merging with conflict)
  */
 public class merge {
     public static void merge(Repo repo,String ... args) {
@@ -55,7 +55,7 @@ public class merge {
 
     }
 
-    /* FastForward merge */
+    /* FastForward merge, just move the pointer */
     private static void mergeFastForward(Repo repo, String targetBranch) {
         /* get the targetBranch and the currentBranch */
         branch tBranch = Utils.readObject(Utils.join(repo.getBranch(), targetBranch), gitlet.branch.class);
@@ -146,7 +146,7 @@ public class merge {
     }
 
     /**
-     * @Description: deal with the problem of modify and conflict
+     * @Description: deal with the file content modification 
      * @Author: Pan Zifeng
      * @Date:   2021/6/18
      * @Param:  sBlobs: the Blobs of splitPoint;    tBlobs: the Blobs of the given branch
@@ -176,7 +176,7 @@ public class merge {
         }
     }
 
-    // deal with the problem of file contents conflict
+    /* handle the conflict after merging two branches */
     private static void dealWithConflict(Repo repo, String targetBranch,
                                   HashMap<String,String> tBlobs,
                                   HashMap<String,String> cBlobs) {
@@ -194,7 +194,8 @@ public class merge {
         if (conflictFlag) System.out.println("Encountered a merge conflict.");
         else System.out.println("Merged " + repo.getCurrBranch() + " with " + targetBranch);
     }
-
+    
+    /* the Helper function used for conflict handling */
     private static boolean conflictHelper(Repo repo, Blob cBlob, Blob tBlob, String file,String targetBranch){
         byte[] cBytes = cBlob.get_Content().getBytes(StandardCharsets.UTF_8);
         byte[] tBytes = tBlob.get_Content().getBytes(StandardCharsets.UTF_8);
@@ -240,6 +241,7 @@ public class merge {
         }
     }
 
+    /* compare two files to judge whether there are some changes */
     private static boolean modifyCompare(Blob pastBlob, Blob currBlob){
         return pastBlob.get_Content().equals(currBlob.get_Content());
     }
